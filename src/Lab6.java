@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -17,6 +18,7 @@ public class Lab6 {
     private static String userSentence = "";
     private static String endSentenceWith = "";
     private static ArrayList<String> userWords = new ArrayList<>();
+    private static String currentWord = "";
 
     public static void main(String[] args) {
         do {
@@ -37,26 +39,20 @@ public class Lab6 {
 
             //checking each word
             for(i = 0; i < userWords.size(); i++) {
+                currentWord = userWords.get(i);
 
                 // leaves anything with a special character alone, proceeds to translate anything else
-                if (userWords.get(i).matches("^.*[^a-zA-Z'].*$")) {// the word remains the same, because it isn't actually a word!
-                    userWords.set(i, userWords.get(i));
-                } else {
+                if (currentWord.matches("^.*[^a-zA-Z'].*$")) {// the word remains the same, because it isn't actually a word!
+                    userWords.set(i, currentWord);
+                } else if (currentWord.matches("^[aeiou].*$")) {
                     //figures out which case the word is in, then switches to lowercase for translating
                     setCase();
-                    userWords.set(i, userWords.get(i).toLowerCase());
-
-                    //setTranslatedWord();
-
-                    if (userWords.get(i).matches("^[aeiou].*$")) {
-                        translateVowelFirst();
-                    } else {
-                        if(userWords.get(i).matches("^.*[aeiou].*$")) {
-                            translateConsonantFirst();
-                        } else {
-                            userWords.set(i, (userWords.get(i) + "ay"));
-                        }
-                    }
+                    userWords.set(i, currentWord.toLowerCase());
+                    translateVowelFirst();
+                } else if(currentWord.matches("^.*[aeiou].*$")) {
+                    translateConsonantFirst();
+                } else {
+                    userWords.set(i, (currentWord + "ay"));
                 }
             }
 
@@ -69,8 +65,7 @@ public class Lab6 {
 
             //clears my scanner
             scnr.nextLine();
-        }
-        while(doAgain);
+        } while(doAgain);
 
         System.out.println("Goodbye!");
     }
@@ -115,9 +110,7 @@ public class Lab6 {
      */
     private static void splitSentence () {
         //enhanced for loop that splits the string every place it finds a space
-        for(String word : userSentence.split(" ")) {
-            userWords.add(word);
-        }
+        userWords = new ArrayList<>(Arrays.asList(userSentence.split(" ")));
     }
 
     /**
@@ -129,11 +122,11 @@ public class Lab6 {
         hasLowerCase = false;
         hasUpperCase = false;
 
-        if (userWords.get(i).matches("^.*[a-z].*$")) { // if this word has any lower case characters
+        if (currentWord.matches("^.*[a-z].*$")) { // if this word has any lower case characters
             //if in possession of an uppercase letter
             hasLowerCase = true;
         }
-        if (userWords.get(i).matches("^.*[A-Z].*$")) {
+        if (currentWord.matches("^.*[A-Z].*$")) {
             hasUpperCase = true;
         }
     }
@@ -142,11 +135,11 @@ public class Lab6 {
      * translates any word that starts with a vowel
      */
     private static void translateVowelFirst() {
-        String upperCase = (userWords.get(i) + "way").toUpperCase();
-        String titleCase = (Character.toString(userWords.get(i).charAt(0)).toUpperCase() +
-                userWords.get(i).substring(1, userWords.get(i).length()) +
+        String upperCase = (currentWord + "way").toUpperCase();
+        String titleCase = (Character.toString(currentWord.charAt(0)).toUpperCase() +
+                currentWord.substring(1, currentWord.length()) +
                 "way");
-        String lowerCase = userWords.get(i) + "way";
+        String lowerCase = currentWord + "way";
 
         userWords.set(i, getWordWithCase(upperCase, titleCase, lowerCase));
     }
@@ -155,30 +148,23 @@ public class Lab6 {
      * translates any word that starts with a consonant
      */
     private static void translateConsonantFirst() {
-        int j = 0;
-
-        for(j = 0; j < userWords.get(i).length(); j++) {
-            if(Character.toString(userWords.get(i).charAt(j)).matches("^.*[aeiou].*$")) {
+        for(int j = 0; j < currentWord.length(); j++) {
+            if(Character.toString(currentWord.charAt(j)).matches("^.*[aeiou].*$")) {
                 firstVowel = j;
                 break; // breaks once the first vowel is found
             }
         }
 
-        String upperCase = (userWords.get(i).substring(firstVowel, userWords.get(i).length()) +
-                userWords.get(i).substring(0, firstVowel).trim() +
+        String upperCase = (currentWord.substring(firstVowel, currentWord.length()) +
+                currentWord.substring(0, firstVowel).trim() +
                 "ay").toUpperCase();
-        String titleCase = Character.toString(userWords.get(i).charAt(firstVowel)).toUpperCase() +
-                userWords.get(i).substring((firstVowel + 1), userWords.get(i).length()) +
-                userWords.get(i).substring(0, firstVowel) +
+        String titleCase = Character.toString(currentWord.charAt(firstVowel)).toUpperCase() +
+                currentWord.substring((firstVowel + 1), currentWord.length()) +
+                currentWord.substring(0, firstVowel) +
                 "ay";
-        String lowerCase = userWords.get(i).substring(firstVowel, userWords.get(i).length()) +
-                userWords.get(i).substring(0, firstVowel).trim() +
+        String lowerCase = currentWord.substring(firstVowel, currentWord.length()) +
+                currentWord.substring(0, firstVowel).trim() +
                 "ay";
-
-        System.out.println("0 "
-                + (firstVowel - 1) + " - "
-                + firstVowel + " "
-                + (userWords.get(i).length() - 1));
 
         userWords.set(i, getWordWithCase(upperCase, titleCase, lowerCase));
     }
